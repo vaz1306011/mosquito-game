@@ -45,9 +45,9 @@ class Mosquito(pygame.sprite.Sprite):
 
 
 # 隨機產生位置
-def get_random_position(widow_width, window_height, image_width, image_height):
-    random_x = random.uniform(image_width, widow_width - image_width)
-    random_y = random.uniform(image_height, window_height - image_height)
+def get_random_position(widow_width, window_height):
+    random_x = random.uniform(0, widow_width)
+    random_y = random.uniform(0, window_height)
 
     return random_x, random_y
 
@@ -58,7 +58,6 @@ def add_mosquito(window_surface, mosquito):
 
 
 def main():
-
     random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
     mosquito = Mosquito(random_x, random_y)
 
@@ -71,9 +70,11 @@ def main():
     my_font = pygame.font.SysFont(None, 30)
     my_hit_font = pygame.font.SysFont(None, 40)
     hit_text_surface = None
+    i = 0
 
     while True:
         clock.tick(FPS)
+        # print(pygame.event.get())
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -84,18 +85,21 @@ def main():
 
                 # 蚊子新位置
                 random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
-                mosquito = Mosquito(
-                    random_x,
-                    random_y,
-                    WINDOW_WIDTH,
-                    WINDOW_HEIGHT,
-                )
+                mosquito = Mosquito(random_x, random_y)
 
             # 檢查是否滑鼠位置 x, y 在蚊子圖片上
             mouse_pos = pygame.mouse.get_pos()
 
-            # TODO 蚊子判斷
-            if ...:
+            if (
+                mosquito.rect.left <= mouse_pos[0] <= mosquito.rect.right
+                and mosquito.rect.top <= mouse_pos[1] <= mosquito.rect.bottom
+            ):
+                # if (
+                #     random_x < mouse_pos[0] < random_x + IMAGEWIDTH
+                #     and random_y < mouse_pos[1] < random_y + IMAGEHEIGHT
+                # ):
+                i = i + 1
+                # print(i)
                 mosquito.kill()
                 random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
                 mosquito = Mosquito(random_x, random_y)
