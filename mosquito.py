@@ -1,5 +1,6 @@
 import random
 import sys
+from typing import Tuple
 
 import pygame
 from pygame.locals import MOUSEBUTTONDOWN, QUIT, USEREVENT
@@ -17,6 +18,8 @@ WHITE = pygame.Color("white")
 BLACK = pygame.Color("black")
 
 clock = pygame.time.Clock()
+all_sprite = pygame.sprite.Group()
+
 
 # 讀取貼圖
 mosquito_sprite = pygame.image.load("./mosquito_sprite.png").convert_alpha()
@@ -26,7 +29,7 @@ class Mosquito(pygame.sprite.Sprite):
     SPRITE_WIDTH = 100
     SPRITE_HEIGHT = 100
 
-    def __init__(self, x, y):
+    def __init__(self, x, y) -> None:
         # pygame物件繼承init
         super().__init__()
 
@@ -37,7 +40,7 @@ class Mosquito(pygame.sprite.Sprite):
         self.rect = self.sprite.get_rect()  # 蚊子位置
         self.rect.center = (x, y)
 
-    def check_mouse(self, mouse_pos):
+    def check_mouse(self, mouse_pos) -> bool:
         # 檢查是否滑鼠位置 x, y 在蚊子圖片上
         if self.rect.collidepoint(mouse_pos):
             return True
@@ -45,7 +48,7 @@ class Mosquito(pygame.sprite.Sprite):
 
 
 # 隨機產生位置
-def get_random_position(widow_width, window_height):
+def get_random_position(widow_width, window_height) -> Tuple[float, float]:
     random_x = random.uniform(0, widow_width)
     random_y = random.uniform(0, window_height)
 
@@ -53,13 +56,15 @@ def get_random_position(widow_width, window_height):
 
 
 # 生成蚊子
-def add_mosquito(window_surface, mosquito):
-    ...
+def add_mosquito() -> Mosquito:
+    random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
+    mosquito = Mosquito(random_x, random_y)
+    all_sprite.add(mosquito)
+    return mosquito
 
 
 def main():
-    random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
-    mosquito = Mosquito(random_x, random_y)
+    mosquito = add_mosquito()
 
     reload_mosquito_event = USEREVENT + 1
 
@@ -70,39 +75,25 @@ def main():
     my_font = pygame.font.SysFont(None, 30)
     my_hit_font = pygame.font.SysFont(None, 40)
     hit_text_surface = None
-    i = 0
 
     while True:
         clock.tick(FPS)
-        # print(pygame.event.get())
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
             elif event.type == reload_mosquito_event:
-                # 偵測到重新整理事件，固定時間移除蚊子，換新位置
                 mosquito.kill()
-
-                # 蚊子新位置
-                random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
-                mosquito = Mosquito(random_x, random_y)
+                mosquito = add_mosquito()
 
             # 檢查是否滑鼠位置 x, y 在蚊子圖片上
             mouse_pos = pygame.mouse.get_pos()
-
             if (
                 mosquito.rect.left <= mouse_pos[0] <= mosquito.rect.right
                 and mosquito.rect.top <= mouse_pos[1] <= mosquito.rect.bottom
             ):
-                # if (
-                #     random_x < mouse_pos[0] < random_x + IMAGEWIDTH
-                #     and random_y < mouse_pos[1] < random_y + IMAGEHEIGHT
-                # ):
-                i = i + 1
-                # print(i)
                 mosquito.kill()
-                random_x, random_y = get_random_position(WINDOW_WIDTH, WINDOW_HEIGHT)
-                mosquito = Mosquito(random_x, random_y)
+                mosquito = add_mosquito()
                 # hit_text_surface = my_hit_font.render("Hit!!", True, BLACK)
                 # 每次加五分
                 points += 5
